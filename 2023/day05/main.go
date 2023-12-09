@@ -108,17 +108,6 @@ func part2(seeds []int64, mappings [7][]int64) int64 {
 		}
 	}
 
-	/*for i := 0; i < len(seeds)/2; i++ {
-		start := seeds[i*2]
-		r := seeds[i*2+1]
-
-		location := mapSeedRange(start, r, mappings)
-
-		if location < lowest {
-			lowest = location
-		}
-	}*/
-
 	return lowest
 }
 func part1(seeds []int64, mappings [7][]int64) int64 {
