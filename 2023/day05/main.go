@@ -17,8 +17,6 @@ func main() {
 	fmt.Printf("Part 2: %d\n", part2(seeds, mappings))
 }
 func part2(seeds []int64, mappings [7][]int64) int64 {
-	//Too high:  178159714
-
 	lowest := int64(math.MaxInt64)
 
 	for i := 0; i < len(seeds)/2; i++ {
