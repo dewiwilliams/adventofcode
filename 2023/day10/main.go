@@ -27,8 +27,98 @@ func main() {
 	grid, width, start := parseData("input.txt")
 
 	fmt.Printf("Part 1: %d\n", part1(grid, width, start))
+	fmt.Printf("Part 2: %d\n", part2(grid, width, start))
 }
-func part1(grid []int, width int, start []int) int {
+func part2(gridSource []int, width int, start []int) int {
+	grid := make([]int, len(gridSource))
+	copy(grid, gridSource)
+	startCell := start[0] + start[1]*width
+
+	if grid[startCell] != startCellType {
+		panic("Starting cell is not correct")
+	}
+
+	grid[startCell] = start[2]
+	distanceMap := buildDistanceMap(grid, width, startCell)
+	zeroNonLoopCells(grid, distanceMap, startCell)
+
+	return countInternalCells(grid, width)
+}
+func countInternalCells(grid []int, width int) int {
+	result := 0
+
+	for i := range grid {
+		if grid[i] != emptyCellType {
+			continue
+		}
+		if getLoopCrossings(grid, width, i)%2 == 1 {
+			result++
+		}
+	}
+
+	return result
+}
+func zeroNonLoopCells(grid, distanceMap []int, start int) {
+	for i := range grid {
+		if distanceMap[i] == 0 && i != start {
+			grid[i] = emptyCellType
+		}
+	}
+}
+func getLoopCrossings(grid []int, width, cell int) int {
+	if grid[cell] != emptyCellType {
+		panic("Expected empty cell type")
+	}
+
+	result := 0
+
+	startX := cell % width
+	startY := cell / width
+
+	lineEntryCell := emptyCellType
+
+	for x := startX; x >= 0; x-- {
+		currentCell := x + startY*width
+		if grid[currentCell] == emptyCellType {
+			continue
+		} else if grid[currentCell] == upDownPipe {
+			result++
+		} else if grid[currentCell] == leftUpPipe || grid[currentCell] == downLeftPipe {
+			if lineEntryCell != emptyCellType {
+				panic("Expected line entry cell type to be empty")
+			}
+			lineEntryCell = grid[currentCell]
+		} else if grid[currentCell] == leftRightPipe {
+			if lineEntryCell == emptyCellType {
+				panic("Expected line entry cell type to be non-empty")
+			}
+		} else if grid[currentCell] == rightDownPipe {
+			if lineEntryCell == emptyCellType {
+				panic("Expected line entry cell type to be non-empty")
+			}
+			if lineEntryCell == leftUpPipe {
+				result++
+			}
+			lineEntryCell = emptyCellType
+		} else if grid[currentCell] == upRightPipe {
+			if lineEntryCell == emptyCellType {
+				panic("Expected line entry cell type to be non-empty")
+			}
+			if lineEntryCell == downLeftPipe {
+				result++
+			}
+			lineEntryCell = emptyCellType
+		} else {
+			panic("Unexpected cell type")
+		}
+	}
+
+	return result
+}
+func part1(gridSource []int, width int, start []int) int {
+	grid := make([]int, len(gridSource))
+	copy(grid, gridSource)
+
 	startCell := start[0] + start[1]*width
 
 	if grid[startCell] != startCellType {

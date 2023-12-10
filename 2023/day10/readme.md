@@ -1,5 +1,5 @@
-You'll need to add an extra line of information to that start of the input file that has three integer values with the values of the Starting cell:
-x y value
+You'll need to add an extra line of information to the start of the input file that has three integer values with the values of the Starting cell:
+x y cellType
 
 For example:
 ```
