@@ -11,9 +11,18 @@ import (
 
 func main() {
 	data := parseData("input.txt")
-	//fmt.Printf("Got data: %v\n", data)
 
 	fmt.Printf("Part 1: %d\n", part1(data))
+	fmt.Printf("Part 2: %d\n", part2(data))
+}
+func part2(data [][]int) int64 {
+	result := int64(0)
+
+	for _, d := range data {
+		result += int64(getPreviousValue(d))
+	}
+
+	return result
 }
 func part1(data [][]int) int64 {
 	result := int64(0)
@@ -23,6 +32,14 @@ func part1(data [][]int) int64 {
 	}
 
 	return result
+}
+func getPreviousValue(sequence []int) int {
+	if isConstantSequence(sequence) {
+		return sequence[0]
+	}
+
+	differences := getDifferences(sequence)
+	return sequence[0] - getPreviousValue(differences)
 }
 func getNextValue(sequence []int) int {
 	if isConstantSequence(sequence) {
