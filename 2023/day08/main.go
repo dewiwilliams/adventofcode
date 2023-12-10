@@ -8,16 +8,137 @@ import (
 	"strings"
 )
 
+type node struct {
+	left  string
+	right string
+}
+
 func main() {
 	directions, nodes := parseData("input.txt")
 
 	fmt.Printf("Part 1: %d\n", part1(directions, nodes))
+	fmt.Printf("Part 2: %d\n", part2(directions, nodes))
+}
+func part2(directions []rune, nodeData []string) int64 {
+	nodes := buildNodesMapData(nodeData)
+	startingLocations := getStartingLocations(nodeData)
+
+	cycleOffsets := []int64{}
+	cycleLengths := []int64{}
+
+	for _, location := range startingLocations {
+		offset, length := getCycleLength(location, directions, nodes)
+
+		if offset != length {
+			// This is an observation from the data.
+			panic("cycle offset and length are not equal!")
+		}
+		cycleOffsets = append(cycleOffsets, int64(offset))
+		cycleLengths = append(cycleLengths, int64(length))
+	}
+
+	return lcm(cycleLengths[0], cycleLengths[1], cycleLengths[2:]...)
+}
+func gcd(a, b int64) int64 {
+	for b != 0 {
+		t := b
+		b = a % b
+		a = t
+	}
+	return a
+}
+
+func lcm(a, b int64, integers ...int64) int64 {
+	result := a * b / gcd(a, b)
+
+	for i := 0; i < len(integers); i++ {
+		result = lcm(result, integers[i])
+	}
+
+	return result
+}
+func getLocationAfterSteps(startingLocation string, directions []rune, nodes map[string]node, steps int64) string {
+	currentLocation := startingLocation
+	directionLength := int64(len(directions))
+
+	for i := int64(0); i < steps; i++ {
+		directionIndex := i % directionLength
+
+		currentLocation = advance(nodes, currentLocation, directions[directionIndex])
+	}
+
+	return currentLocation
+}
+func getCycleLength(startingLocation string, directions []rune, nodes map[string]node) (int, int) {
+	offset := 0
+	lastCycleIndex := 0
+	currentLocation := startingLocation
+	directionLength := len(directions)
+
+	for step := 0; ; step++ {
+		directionIndex := step % directionLength
+
+		currentLocation = advance(nodes, currentLocation, directions[directionIndex])
+		if currentLocation[2] == 'Z' {
+			if offset == 0 {
+				offset = step + 1
+				lastCycleIndex = step
+			} else {
+				return offset, step - lastCycleIndex
+			}
+		}
+	}
+}
+func getStartingLocations(nodeData []string) []string {
+	result := []string{}
+
+	for i := 0; i < len(nodeData)/3; i++ {
+		if nodeData[i*3][2] == 'A' {
+			result = append(result, nodeData[i*3])
+		}
+	}
+
+	return result
+}
+func getEndNodeCount(nodes []string) int {
+	result := 0
+
+	for _, node := range nodes {
+		if node[2] == 'Z' {
+			result++
+		}
+	}
+
+	return result
+}
+func areAllEndNodes(nodes []string) bool {
+	return getEndNodeCount(nodes) == len(nodes)
 }
 func part1(directions []rune, nodeData []string) int {
-	type node struct {
-		left  string
-		right string
+
+	nodes := buildNodesMapData(nodeData)
+	currentLocation := "AAA"
+	directionLength := len(directions)
+
+	for step := 0; ; step++ {
+		directionIndex := step % directionLength
+		currentLocation = advance(nodes, currentLocation, directions[directionIndex])
+
+		if currentLocation == "ZZZ" {
+			return step + 1
+		}
 	}
+}
+func advance(nodes map[string]node, currentLocation string, direction rune) string {
+	if direction == 'L' {
+		return nodes[currentLocation].left
+	} else if direction == 'R' {
+		return nodes[currentLocation].right
+	} else {
+		panic("direction is not left or right")
+	}
+}
+func buildNodesMapData(nodeData []string) map[string]node {
 	nodes := make(map[string]node)
 	for i := 0; i < len(nodeData)/3; i++ {
 		nodes[nodeData[i*3]] = node{
@@ -26,23 +147,7 @@ func part1(directions []rune, nodeData []string) int {
 		}
 	}
 
-	currentLocation := "AAA"
-	directionLength := len(directions)
-
-	for step := 0; ; step++ {
-		directionIndex := step % directionLength
-		if directions[directionIndex] == 'L' {
-			currentLocation = nodes[currentLocation].left
-		} else if directions[directionIndex] == 'R' {
-			currentLocation = nodes[currentLocation].right
-		} else {
-			panic("direction is not left or right")
-		}
-
-		if currentLocation == "ZZZ" {
-			return step + 1
-		}
-	}
+	return nodes
 }
 func parseData(filename string) ([]rune, []string) {
 	file, err := os.Open(filename)
