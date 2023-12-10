@@ -27,3 +27,16 @@ func TestGetHandType(t *testing.T) {
 func TestGetHandCardScore(t *testing.T) {
 	assert.Equal(t, 0xDD677, getHandCardScore([]rune("KK677")), "KK677")
 }
+func TestGetPromotedHandType(t *testing.T) {
+	assert.Equal(t, FOUR_OF_A_KIND, getPromotedHandType([]rune("T55J5")), "T55J5")
+	assert.Equal(t, FOUR_OF_A_KIND, getPromotedHandType([]rune("KTJJT")), "KTJJT")
+	assert.Equal(t, FOUR_OF_A_KIND, getPromotedHandType([]rune("QQQJA")), "QQQJA")
+
+	assert.Equal(t, FIVE_OF_A_KIND, getPromotedHandType([]rune("QQQJQ")), "QQQJQ")
+	assert.Equal(t, FOUR_OF_A_KIND, getPromotedHandType([]rune("QQQJ6")), "QQQJ6")
+	assert.Equal(t, FULL_HOUSE, getPromotedHandType([]rune("QQAJA")), "QQAJA")
+	assert.Equal(t, THREE_OF_A_KIND, getPromotedHandType([]rune("QQAJ4")), "QQAJ4")
+	assert.Equal(t, ONE_PAIR, getPromotedHandType([]rune("Q5AJ4")), "Q5AJ4")
+
+	assert.Equal(t, FIVE_OF_A_KIND, getPromotedHandType([]rune("QJQJQ")), "QJQJQ")
+}
