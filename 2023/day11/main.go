@@ -5,22 +5,29 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strings"
+
+	"golang.org/x/exp/slices"
 )
 
 func main() {
 	grid, width := parseData("input.txt")
-	printGrid(grid, width)
-
-	fmt.Println()
 
 	fmt.Printf("Part 1: %d\n", part1(grid, width))
+	fmt.Printf("Part 2: %d\n", part2(grid, width))
 }
-func part1(gridSource []bool, widthSource int) int {
-	grid, width := expandGrid(gridSource, widthSource)
-	printGrid(grid, width)
+func part1(grid []bool, width int) int64 {
+	return calculateGalaxyDistances(grid, width, 1)
+}
+func part2(grid []bool, width int) int64 {
+	return calculateGalaxyDistances(grid, width, 1000000-1)
+}
+func calculateGalaxyDistances(grid []bool, width, emptySpaceGap int) int64 {
+	emptyRows := getEmptyRows(grid, width)
+	emptyColumns := getEmptyColumns(grid, width)
 
-	result := 0
+	result := int64(0)
 	galaxies := getGalaxies(grid)
 	galaxyCount := len(galaxies)
 
@@ -31,7 +38,25 @@ func part1(gridSource []bool, widthSource int) int {
 			xj := galaxies[j] % width
 			yj := galaxies[j] / width
 
-			result += getManhattanDistance(xi, yi, xj, yj)
+			thisDistance := getManhattanDistance(xi, yi, xj, yj)
+			thisDistance += emptySpaceGap * getValueRangeInArray(xi, xj, emptyColumns)
+			thisDistance += emptySpaceGap * getValueRangeInArray(yi, yj, emptyRows)
+
+			result += int64(thisDistance)
+		}
+	}
+
+	return result
+}
+func getValueRangeInArray(v1, v2 int, values []int) int {
+	result := 0
+
+	r := []int{v1, v2}
+	sort.Ints(r)
+
+	for i := r[0]; i < r[1]; i++ {
+		if slices.Contains(values, i) {
+			result++
 		}
 	}
 
@@ -56,81 +81,6 @@ func getGalaxies(grid []bool) []int {
 		}
 	}
 
-	return result
-}
-func expandGrid(grid []bool, width int) ([]bool, int) {
-	grid2, width2 := doubleEmptyColumns(grid, width)
-	return doubleEmptyRows(grid2, width2)
-}
-func doubleEmptyRows(grid []bool, width int) ([]bool, int) {
-	height := len(grid) / width
-	emptyRows := getEmptyRows(grid, width)
-	emptyIndex := 0
-	newRows := [][]bool{}
-
-	for y := 0; y < height; y++ {
-		row := getRow(grid, width, y)
-		newRows = append(newRows, row)
-
-		if emptyIndex < len(emptyRows) && emptyRows[emptyIndex] == y {
-			newRows = append(newRows, row)
-			emptyIndex++
-		}
-	}
-
-	return mergeRows(newRows), width
-}
-func doubleEmptyColumns(grid []bool, width int) ([]bool, int) {
-	emptyColumns := getEmptyColumns(grid, width)
-	emptyIndex := 0
-	newColumns := [][]bool{}
-
-	for x := 0; x < width; x++ {
-		column := getColumn(grid, width, x)
-		newColumns = append(newColumns, column)
-
-		if emptyIndex < len(emptyColumns) && emptyColumns[emptyIndex] == x {
-			newColumns = append(newColumns, column)
-			emptyIndex++
-		}
-	}
-
-	return mergeColumns(newColumns), width + len(emptyColumns)
-}
-func mergeColumns(columns [][]bool) []bool {
-	width := len(columns)
-	height := len(columns[0])
-	result := make([]bool, width*height)
-
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
-			cell := x + y*width
-			result[cell] = columns[x][y]
-		}
-	}
-
-	return result
-}
-func getColumn(grid []bool, width, column int) []bool {
-	height := len(grid) / width
-	result := make([]bool, height)
-	for y := 0; y < height; y++ {
-		result[y] = grid[column+y*width]
-	}
-	return result
-}
-func mergeRows(rows [][]bool) []bool {
-	result := rows[0]
-	for i := 1; i < len(rows); i++ {
-		result = append(result, rows[i]...)
-	}
-	return result
-}
-func getRow(grid []bool, width, row int) []bool {
-	result := make([]bool, width)
-	for x := 0; x < width; x++ {
-		result[x] = grid[x+row*width]
-	}
 	return result
 }
 func getEmptyColumns(grid []bool, width int) []int {
