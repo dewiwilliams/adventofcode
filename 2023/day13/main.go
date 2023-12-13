@@ -18,69 +18,91 @@ func main() {
 	grids := parseData("input.txt")
 
 	fmt.Printf("Part 1: %d\n", part1(grids))
+	fmt.Printf("Part 2: %d\n", part2(grids))
+}
+func part2(grids []grid) int {
+	result := 0
+
+	for _, g := range grids {
+		result += getGridResult(g, 1)
+	}
+
+	return result
 }
 func part1(grids []grid) int {
 	result := 0
 
 	for _, g := range grids {
-		result += getPart1GridResult(g)
+		result += getGridResult(g, 0)
 	}
 
 	return result
 }
-func getPart1GridResult(grid grid) int {
+func getGridResult(grid grid, requiredDifference int) int {
 	for i := 0; i < grid.width; i++ {
-		if isVerticalMirrorLine(grid, i) {
+		if getVerticalMirrorLineDifference(grid, i) == requiredDifference {
 			return i + 1
 		}
 	}
 
 	for i := 0; i < grid.height; i++ {
-		if isHorizontalMirrorLine(grid, i) {
+		if getHorizontalMirrorLineDifference(grid, i) == requiredDifference {
 			return (i + 1) * 100
 		}
 	}
 
 	panic("No line of symmetry found")
 }
-func isVerticalMirrorLine(grid grid, x int) bool {
+
+func getVerticalMirrorLineDifference(grid grid, x int) int {
+	result := 0
+
 	for i := 0; ; i++ {
 		start1 := x - i
 		start2 := x + i + 1
 
 		if start1 < 0 || start2 >= grid.width {
-			return i != 0
+			if i == 0 {
+				return 1000
+			}
+
+			return result
 		}
 
-		if !doLinesMatch(grid, start1, start2, grid.width, grid.height) {
-			return false
-		}
+		result += getLineDifference(grid, start1, start2, grid.width, grid.height)
 	}
 }
-func isHorizontalMirrorLine(grid grid, y int) bool {
+
+func getHorizontalMirrorLineDifference(grid grid, y int) int {
+	result := 0
+
 	for i := 0; ; i++ {
 		start1 := (y - i) * grid.width
 		start2 := (y + i + 1) * grid.width
 
 		if y-i < 0 || y+i+1 >= grid.height {
-			return i != 0
+			if i == 0 {
+				return 1000
+			}
+
+			return result
 		}
 
-		if !doLinesMatch(grid, start1, start2, 1, grid.width) {
-			return false
-		}
+		result += getLineDifference(grid, start1, start2, 1, grid.width)
 	}
 }
-func doLinesMatch(grid grid, start1, start2, step, length int) bool {
+func getLineDifference(grid grid, start1, start2, step, length int) int {
+	result := 0
+
 	for i := 0; i < length; i++ {
 		cell1 := start1 + i*step
 		cell2 := start2 + i*step
 
 		if grid.data[cell1] != grid.data[cell2] {
-			return false
+			result++
 		}
 	}
-	return true
+	return result
 }
 func printGrid(grid grid) {
 	height := len(grid.data) / grid.width
