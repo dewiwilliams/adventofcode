@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"strings"
+
+	"adventofcode/util"
 )
 
 const emptyCell = 0
@@ -64,7 +66,7 @@ func getCombinationsImpl(records, clues []int, recordOffset, clueOffset int, wor
 		}
 
 		fillWorkspace(workspace, i, clues[clueOffset], filledCell)
-		if isPatternValid(records, workspace, min(len(workspace), i+clues[clueOffset])) {
+		if isPatternValid(records, workspace, util.Min(len(workspace), i+clues[clueOffset])) {
 			result += getCachedCombinations(records, clues, i+clues[clueOffset]+1, clueOffset+1, workspace, cache)
 		}
 		fillWorkspace(workspace, i, clues[clueOffset], emptyCell)
@@ -123,7 +125,7 @@ func doesSpringFit(records []int, recordOffset, clue int) bool {
 	return true
 }
 func parseData(filename string) ([][]int, [][]int) {
-	fileData := getFileLines(filename)
+	fileData := util.GetFileLines(filename)
 
 	records := [][]int{}
 	clues := [][]int{}
@@ -133,8 +135,8 @@ func parseData(filename string) ([][]int, [][]int) {
 	for _, line := range fileData {
 		parts := strings.Split(line, " ")
 
-		records = append(records, mapStringToArray(parts[0], mapping))
-		clues = append(clues, parseIntegerArray(parts[1], ","))
+		records = append(records, util.MapStringToArray(parts[0], mapping))
+		clues = append(clues, util.ParseIntegerArray(parts[1], ","))
 	}
 
 	return records, clues

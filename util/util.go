@@ -1,4 +1,4 @@
-package main
+package util
 
 import (
 	"bufio"
@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func getFileLines(filename string) []string {
+func GetFileLines(filename string) []string {
 	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -21,10 +21,6 @@ func getFileLines(filename string) []string {
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		if len(line) == 0 {
-			continue
-		}
-
 		result = append(result, line)
 	}
 
@@ -34,7 +30,7 @@ func getFileLines(filename string) []string {
 
 	return result
 }
-func mapStringToArray(source string, mapping map[rune]int) []int {
+func MapStringToArray(source string, mapping map[rune]int) []int {
 	result := make([]int, len(source))
 
 	for i, r := range source {
@@ -43,7 +39,7 @@ func mapStringToArray(source string, mapping map[rune]int) []int {
 
 	return result
 }
-func parseIntegerArray(source, separator string) []int {
+func ParseIntegerArray(source, separator string) []int {
 	result := []int{}
 
 	parts := strings.Split(source, separator)
@@ -54,19 +50,19 @@ func parseIntegerArray(source, separator string) []int {
 
 	return result
 }
-func max(a, b int) int {
+func Max(a, b int) int {
 	if a > b {
 		return a
 	}
 	return b
 }
-func min(a, b int) int {
+func Min(a, b int) int {
 	if a < b {
 		return a
 	}
 	return b
 }
-func joinIntArray(values []int, delim string) string {
+func JoinIntArray(values []int, delim string) string {
 	stringValues := []string{}
 	for _, v := range values {
 		stringValues = append(stringValues, strconv.Itoa(v))
