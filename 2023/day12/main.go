@@ -10,11 +10,11 @@ const unknownCell = 1
 const filledCell = 2
 
 func main() {
-	records, clues := parseData("sample_input.txt")
+	records, clues := parseData("input.txt")
 	fmt.Printf("Got data: %v, %v\n", records, clues)
 
 	fmt.Printf("Part 1: %d\n", part1(records, clues))
-	//fmt.Printf("Part 2: %d\n", part2(records, clues))
+	fmt.Printf("Part 2: %d\n", part2(records, clues))
 }
 func part1(records, clues [][]int) int {
 	result := 0
@@ -55,7 +55,7 @@ func getCombinations(records, clues []int) int {
 }
 func getCombinationsImpl(records, clues []int, recordOffset, clueOffset int, workspace []int) int {
 	if clueOffset == len(clues) {
-		if isPatternValid(records, workspace) {
+		if isPatternValid(records, workspace, len(records)) {
 			return 1
 		} else {
 			return 0
@@ -68,21 +68,24 @@ func getCombinationsImpl(records, clues []int, recordOffset, clueOffset int, wor
 	result := 0
 
 	for i := recordOffset; i < len(records); i++ {
+		if records[i] == emptyCell {
+			continue
+		}
 		if !doesSpringFit(records, i, clues[clueOffset]) {
 			continue
 		}
 
 		fillWorkspace(workspace, i, clues[clueOffset], filledCell)
-
-		result += getCombinationsImpl(records, clues, i+clues[clueOffset]+1, clueOffset+1, workspace)
-
+		if isPatternValid(records, workspace, min(len(workspace), i+clues[clueOffset])) {
+			result += getCombinationsImpl(records, clues, i+clues[clueOffset]+1, clueOffset+1, workspace)
+		}
 		fillWorkspace(workspace, i, clues[clueOffset], emptyCell)
 	}
 
 	return result
 }
-func isPatternValid(records, pattern []int) bool {
-	for i := 0; i < len(records); i++ {
+func isPatternValid(records, pattern []int, length int) bool {
+	for i := 0; i < length; i++ {
 		if pattern[i] == filledCell && records[i] == emptyCell {
 			return false
 		} else if pattern[i] == emptyCell && records[i] == filledCell {
@@ -97,43 +100,6 @@ func fillWorkspace(target []int, start, length, value int) {
 		target[start+i] = value
 	}
 }
-
-/*
-	func getCombinations(records, clues []int, recordOffset, clueOffset int) int {
-		if recordOffset >= len(records) {
-			if clueOffset == len(clues) {
-				return 1
-			}
-			return 0
-		}
-		if clueOffset == len(clues) {
-			return 1
-		}
-
-		result := 0
-
-		for i := recordOffset; i < len(records); i++ {
-			if !doesSpringFit(records, i, clues[clueOffset]) {
-				continue
-			}
-
-			springLength := clues[clueOffset]
-			if i+springLength == len(records) {
-				if clueOffset == len(clues)-1 {
-					return result + 1
-				}
-				return result
-			}
-			if records[i+springLength] == filledCell {
-				continue
-			}
-
-			result += getCombinations(records, clues, i+springLength+1, clueOffset+1)
-		}
-
-		return result
-	}
-*/
 func doesSpringFit(records []int, recordOffset, clue int) bool {
 	if recordOffset+clue > len(records) {
 		return false
