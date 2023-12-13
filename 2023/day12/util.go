@@ -66,3 +66,10 @@ func min(a, b int) int {
 	}
 	return b
 }
+func joinIntArray(values []int, delim string) string {
+	stringValues := []string{}
+	for _, v := range values {
+		stringValues = append(stringValues, strconv.Itoa(v))
+	}
+	return strings.Join(stringValues, delim)
+}

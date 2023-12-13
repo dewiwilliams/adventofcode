@@ -11,7 +11,6 @@ const filledCell = 2
 
 func main() {
 	records, clues := parseData("input.txt")
-	fmt.Printf("Got data: %v, %v\n", records, clues)
 
 	fmt.Printf("Part 1: %d\n", part1(records, clues))
 	fmt.Printf("Part 2: %d\n", part2(records, clues))
@@ -25,8 +24,8 @@ func part1(records, clues [][]int) int {
 
 	return result
 }
-func part2(records, clues [][]int) int {
-	result := 0
+func part2(records, clues [][]int) int64 {
+	result := int64(0)
 
 	for i := range records {
 		extendedRecords := []int{}
@@ -40,9 +39,7 @@ func part2(records, clues [][]int) int {
 			extendedClues = append(extendedClues, clues[i]...)
 		}
 
-		result += getCombinations(extendedRecords, extendedClues)
-
-		fmt.Printf("Processed line: %d\n", i)
+		result += int64(getCombinations(extendedRecords, extendedClues))
 	}
 
 	return result
@@ -51,20 +48,11 @@ func getCombinations(records, clues []int) int {
 	workspace := make([]int, len(records))
 	fillWorkspace(workspace, 0, len(records), emptyCell)
 
-	return getCombinationsImpl(records, clues, 0, 0, workspace)
-}
-func getCombinationsImpl(records, clues []int, recordOffset, clueOffset int, workspace []int) int {
-	if clueOffset == len(clues) {
-		if isPatternValid(records, workspace, len(records)) {
-			return 1
-		} else {
-			return 0
-		}
-	}
-	if recordOffset == len(records) {
-		return 0
-	}
+	cache := make(map[string]int)
 
+	return getCombinationsImpl(records, clues, 0, 0, workspace, cache)
+}
+func getCombinationsImpl(records, clues []int, recordOffset, clueOffset int, workspace []int, cache map[string]int) int {
 	result := 0
 
 	for i := recordOffset; i < len(records); i++ {
@@ -77,12 +65,33 @@ func getCombinationsImpl(records, clues []int, recordOffset, clueOffset int, wor
 
 		fillWorkspace(workspace, i, clues[clueOffset], filledCell)
 		if isPatternValid(records, workspace, min(len(workspace), i+clues[clueOffset])) {
-			result += getCombinationsImpl(records, clues, i+clues[clueOffset]+1, clueOffset+1, workspace)
+			result += getCachedCombinations(records, clues, i+clues[clueOffset]+1, clueOffset+1, workspace, cache)
 		}
 		fillWorkspace(workspace, i, clues[clueOffset], emptyCell)
 	}
 
 	return result
+}
+func getCachedCombinations(records, clues []int, recordOffset, clueOffset int, workspace []int, cache map[string]int) int {
+	if clueOffset == len(clues) {
+		if isPatternValid(records, workspace, len(records)) {
+			return 1
+		} else {
+			return 0
+		}
+	}
+	if recordOffset >= len(records) {
+		return 0
+	}
+
+	key := fmt.Sprintf("%d_%d", recordOffset, clueOffset)
+	if val, ok := cache[key]; ok {
+		return val
+	}
+
+	val := getCombinationsImpl(records, clues, recordOffset, clueOffset, workspace, cache)
+	cache[key] = val
+	return val
 }
 func isPatternValid(records, pattern []int, length int) bool {
 	for i := 0; i < length; i++ {
