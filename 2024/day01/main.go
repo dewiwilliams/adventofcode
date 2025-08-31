@@ -10,7 +10,6 @@ import (
 
 func main() {
 	data := getData("input.txt")
-	_ = data
 
 	part1Data := [2][]int{}
 	part1Data[0] = append(part1Data[0], data[0]...)
