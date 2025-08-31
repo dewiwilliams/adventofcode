@@ -62,6 +62,13 @@ func Min(a, b int) int {
 	}
 	return b
 }
+func Abs(a int) int {
+	if a >= 0 {
+		return a
+	}
+
+	return -a
+}
 func JoinIntArray(values []int, delim string) string {
 	stringValues := []string{}
 	for _, v := range values {
