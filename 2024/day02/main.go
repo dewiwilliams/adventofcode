@@ -15,7 +15,6 @@ const (
 
 func main() {
 	data := getData("input.txt")
-	//fmt.Printf("Data: %+v\n", data)
 
 	fmt.Printf("Part 1: %d\n", part1(data))
 	fmt.Printf("Part 2: %d\n", part2(data))
@@ -25,10 +24,8 @@ func part2(data [][]int) int {
 
 	for _, line := range data {
 		if part2IsSafe(line) {
-			//fmt.Printf("Line %d is safe\n", i)
 			result++
 		} else {
-			//fmt.Printf("Line %d is not safe\n", i)
 		}
 	}
 
