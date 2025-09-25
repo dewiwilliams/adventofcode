@@ -105,16 +105,6 @@ func getPart2AntinodeLocationCount(loc1, loc2, width, height int) []int {
 		}
 	}
 
-	/*antinodeX1, antinodeY1 := x1-xDiff, y1-yDiff
-	if inGrid(antinodeX1, antinodeY1, width, height) {
-		result = append(result, antinodeX1+antinodeY1*width)
-	}
-
-	antinodeX2, antinodeY2 := x2+xDiff, y2+yDiff
-	if inGrid(antinodeX2, antinodeY2, width, height) {
-		result = append(result, antinodeX2+antinodeY2*width)
-	}*/
-
 	return result
 }
 func inGrid(x, y, width, height int) bool {
