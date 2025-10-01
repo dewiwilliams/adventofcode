@@ -9,7 +9,6 @@ import (
 
 func main() {
 	data := getData("input.txt")
-	fmt.Printf("Got data: %v\n", data)
 
 	fmt.Printf("Part 1: %d\n", part1(data))
 	fmt.Printf("Part 2: %d\n", part2(data))
@@ -36,10 +35,10 @@ func part2(data []int) int {
 }
 func handleStoneWithMemoisation(stone, remainingIterations int, cache map[int]int) int {
 	makeKey := func(stone, remainingIterations int) int {
-		return (stone << 8) | remainingIterations
+		return (stone << 16) | remainingIterations
 	}
 
-	if stone < 10 {
+	if stone < 1000 {
 		key := makeKey(stone, remainingIterations)
 		if v, ok := cache[key]; ok {
 			return v
@@ -48,7 +47,7 @@ func handleStoneWithMemoisation(stone, remainingIterations int, cache map[int]in
 
 	result := handleStone(stone, remainingIterations, cache)
 
-	if stone < 10 {
+	if stone < 1000 {
 		key := makeKey(stone, remainingIterations)
 		cache[key] = result
 	}
