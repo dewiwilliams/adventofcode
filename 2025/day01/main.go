@@ -60,7 +60,6 @@ func part2(data []int) int {
 
 func getData(filename string) []int {
 	lines := util.GetFileLines(filename)
-	_ = lines
 
 	result := []int{}
 
