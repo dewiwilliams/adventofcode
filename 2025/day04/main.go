@@ -10,8 +10,6 @@ func main() {
 	//grid := getData("sample_input.txt")
 	grid := getData("input.txt")
 
-	//fmt.Printf("Got grid: %v\n", grid)
-
 	fmt.Printf("Part 1: %d\n", part1(grid))
 	fmt.Printf("Part 2: %d\n", part2(grid))
 }
