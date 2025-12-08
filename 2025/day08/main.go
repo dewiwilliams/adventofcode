@@ -24,12 +24,11 @@ type circuit struct {
 }
 
 func main() {
-	//filename := "sample_input.txt"
 	filename := "input.txt"
 	data := getData(filename)
 
 	fmt.Printf("Part 1: %d\n", part1(data, 1000))
-	//fmt.Printf("Part 2: %d\n", part2(filename))
+	fmt.Printf("Part 2: %d\n", part2(data))
 }
 
 func part1(coordinates []coordinate, iterations int) int {
@@ -68,14 +67,27 @@ func part2(coordinates []coordinate) int {
 	circuits := []circuit{}
 
 	for i := range linkedBoxes {
+		index1 := linkedBoxes[i].index1
+		index2 := linkedBoxes[i].index2
+
+		result := coordinates[index1].x * coordinates[index2].x
+
 		circuits = append(circuits, circuit{
 			boxIndeces: []int{
-				linkedBoxes[i].index1,
-				linkedBoxes[i].index2,
+				index1,
+				index2,
 			},
 		})
 
 		mergeCircuits(circuits)
+
+		sort.Slice(circuits, func(i, j int) bool {
+			return len(circuits[i].boxIndeces) > len(circuits[j].boxIndeces)
+		})
+
+		if len(circuits[0].boxIndeces) == len(coordinates) {
+			return result
+		}
 	}
 
 	return 0
